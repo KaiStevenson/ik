@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 section_length = 10
+mouse_down = False
 
 p1 = np.array([0,0]) #base joint
 p2 = np.array([10,0]) #2nd joint
@@ -41,9 +42,9 @@ def plot(dot):
     global p2
     global p3
     global p4
-    plt.close()
-    fig, ax = plt.subplots()
-    fig.canvas.mpl_connect('button_press_event',on_click)  
+    global fig
+    global ax
+    ax.cla()
     ax.axis([-40,40,-40,40])
     ax.plot([0,p2[0]],[0,p2[1]])
     ax.plot([p2[0],p3[0]],[p2[1],p3[1]])
@@ -82,7 +83,19 @@ def get_vector_angle(origin, end, target):
         a += 360
     return a
 
-def on_click(event):
-    solve(np.array([event.xdata,event.ydata]))
+def update(event):
+    if mouse_down == True:
+        solve(np.array([event.xdata,event.ydata]))
+def mouse_click(event):
+    global mouse_down
+    mouse_down = True
+    update(event)
+def mouse_release(event):
+    global mouse_down
+    mouse_down = False
 
-plot(np.array([0,0]))
+fig, ax = plt.subplots()
+fig.canvas.mpl_connect('motion_notify_event', update)
+fig.canvas.mpl_connect('button_press_event', mouse_click)  
+fig.canvas.mpl_connect('button_release_event', mouse_release)  
+plot(np.array([0, 0]))
