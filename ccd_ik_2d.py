@@ -14,7 +14,7 @@ def solve(tPos):
     global p2
     global p3
     global p4
-    s1,s2,s3,i = 0,0,0,0
+    i = 0
     while True:
         i += 1
         #1
@@ -69,11 +69,6 @@ def get_vector_angle(origin, end, target):
         return 0
     v1 = target - origin
     v2 = end - origin
-    # l1 = np.linalg.norm(v1)
-    # l2 = np.linalg.norm(v2)
-    # cos_th = np.dot(v1, v2)
-    # sin_th = np.cross(v1, v2)
-    # return math.degrees(math.atan2(sin_th, cos_th))
     v1n = v1 / np.linalg.norm(v1)
     v2n = v2 / np.linalg.norm(v2)
     a1 = math.degrees(math.atan2(v1n[0],v1n[1])) - 90
@@ -91,4 +86,3 @@ def on_click(event):
     solve(np.array([event.xdata,event.ydata]))
 
 plot(np.array([0,0]))
-# print(get_vector_angle(np.array([0,0]),np.array([1,0]),np.array([1,5])))
