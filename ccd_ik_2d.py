@@ -21,6 +21,8 @@ def solve(tPos):
         i += 1
         #1
         s1 = get_vector_angle(p3, p4, tPos)
+        s1_r = get_vector_angle(p2, p4, p3)
+        s1 = clamp(s1_r - max_angle, s1, s1_r + max_angle)
         p4 = rotate_around(p4, p3, s1)
         r1 = get_vector_angle(p3, np.array([p3[0] + 1, p3[1]]), p4)
         nc = np.abs(p4[0] - tPos[0]) + np.abs(p4[1] - tPos[1]) < 1 or i > 10
@@ -40,7 +42,7 @@ def solve(tPos):
             p2 = rotate_around(p2, p1, s3)
             p3 = point_in_direction(p2, r2 + s3, section_length)
             p4 = point_in_direction(p3, r1 + r2 + s3, section_length)
-        a1, a2, a3 = r1_r, r2_r, c3
+        a1, a2, a3 = r1_r, r2_r, s1_r
         if nc:
             break
 
@@ -72,9 +74,6 @@ def rotate_around(point, center, angle):
     qx = center[0] + math.cos(a) * (point[0] - center[0]) - math.sin(a) * (point[1] - center[1])
     qy = center[1] + math.sin(a) * (point[0] - center[0]) + math.cos(a) * (point[1] - center[1])
     return np.array([qx, qy])
-
-def relative_joint_angle(joint, prior_p, next_p):
-    return get_vector_angle(joint, next_p, prior_p)
 
 #gets the best angle for one joint
 def get_vector_angle(origin, end, target):
