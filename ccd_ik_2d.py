@@ -69,7 +69,7 @@ def rotate_around(point, center, angle):
     qy = center[1] + math.sin(a) * (point[0] - center[0]) + math.cos(a) * (point[1] - center[1])
     return np.array([qx, qy])
 
-#gets the best angle for one joint
+#returns the angle between the vectors (origin > target) & (origin > end)
 def get_vector_angle(origin, end, target):
     v1 = target - origin
     v2 = end - origin
@@ -79,16 +79,16 @@ def get_vector_angle(origin, end, target):
     a2 = math.degrees(math.atan2(v2n[0],v2n[1])) - 90
     a = a1 - a2
     return a
-
+#returns the absolute rotation of a value, where (1,0) is 0 degrees
+#equivalent to getting the arctan2 of the vector's end point
 def get_vector_angle_nr(origin, target):
     v = target - origin
     vn = v / np.linalg.norm(v)
     a = math.degrees(math.atan2(vn[0], vn[1])) - 90
     return a
-    
 def clamp(minvalue, value, maxvalue):
     return max(minvalue, min(value, maxvalue))
-
+#rewrites the angle to be closer to 0 (270 becomes -90)
 def smallest_angle(angle):
     if angle < 0:
         if angle < -180:
@@ -100,7 +100,7 @@ def smallest_angle(angle):
             return angle - 360
         else:
             return angle
-
+#UI handling
 def update(event):
     if mouse_down == True:
         solve(np.array([event.xdata,event.ydata]))
@@ -111,7 +111,7 @@ def mouse_click(event):
 def mouse_release(event):
     global mouse_down
     mouse_down = False
-
+#initial graphics set-up
 fig, ax = plt.subplots()
 fig.canvas.mpl_connect('motion_notify_event', update)
 fig.canvas.mpl_connect('button_press_event', mouse_click)
