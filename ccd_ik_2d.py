@@ -19,28 +19,25 @@ def solve(tPos):
     while True:
         i += 1
         #find the correct angle for the end effector joint (3)
-        a3_current_absolute = get_vector_angle_nr(p3,p4) #current joint rotation, absolute
-        a3_current_relative = get_vector_angle(p2,p4,p3) #current joint rotation, relative
         a3_rotation_desire = get_vector_angle(p3,p4,tPos) #relative rotation change needed for 3rd joint
+        a3 = smallest_angle(a3) + a3_rotation_desire
         p4 = rotate_around(p4,p3,a3_rotation_desire) #rotate end effector about joint
-        #check if we're close enough
-        nc = np.abs(p4[0] - tPos[0]) + np.abs(p4[1] - tPos[1]) < 1 or i > 10
+        nc = np.abs(p4[0] - tPos[0]) + np.abs(p4[1] - tPos[1]) < 1 or i > 10 #check if we're close enough
         if not nc:
             #find the correct angle for the second joint (2)
-            a2_current_absolute = get_vector_angle_nr(p2,p3) #current joint rotation, absolute
-            a2_current_relative = get_vector_angle(p1,p3,p2) #current joint rotation, relative
             a2_rotation_desire = get_vector_angle(p2,p4,tPos) #relative rotation change needed for 2nd joint
+            a2 = smallest_angle(a2) + a2_rotation_desire
             p3 = rotate_around(p3,p2,a2_rotation_desire) #rotate about joint...
             p4 = rotate_around(p4,p2,a2_rotation_desire) #along with everything connected
             #find the correct angle for the base joint (1)
-            a1_current = get_vector_angle_nr(p1,p2) #current joint rotation, absolute (& relative)
             a1_rotation_desire = get_vector_angle(p1,p4,tPos) #relative rotation change needed for 1st joint
+            a1 = smallest_angle(a1) + a1_rotation_desire
             p2 = rotate_around(p2,p1,a1_rotation_desire)
             p3 = rotate_around(p3,p1,a1_rotation_desire)
             p4 = rotate_around(p4,p1,a1_rotation_desire)
         else:
             plot(tPos)
-            break  
+            return a1_rotation_desire, a2_rotation_desire, a3_rotation_desire
         
 def plot(dot):
     global p1, p2, p3, p4
@@ -49,11 +46,11 @@ def plot(dot):
     ax.cla()
     ax.axis([-40,40,-40,40])
     ax.plot([0,p2[0]],[0,p2[1]])
-    ax.text(0, 0, str(round(smallest_angle(a3))) + "a3")
+    ax.text(0, 0, str(round(smallest_angle(a1))) + "a1")
     ax.plot([p2[0],p3[0]],[p2[1],p3[1]])
     ax.text(p2[0], p2[1], str(round(smallest_angle(a2))) + "a2")
     ax.plot([p3[0],p4[0]],[p3[1],p4[1]])
-    ax.text(p3[0], p3[1], str(round(smallest_angle(a1))) + "a1")
+    ax.text(p3[0], p3[1], str(round(smallest_angle(a3))) + "a3")
     circle = plt.Circle(dot,0.5,color='r')
     ax.add_patch(circle)
     plt.show()
