@@ -1,11 +1,11 @@
 import math
 import numpy as np
 import matplotlib.pyplot as plt
-
+#basic parameters
 section_length = 10
 max_angle = 90
 mouse_down = False
-
+#initial joint positions
 p1 = np.array([0,0]) #base joint
 p2 = np.array([10,0]) #2nd joint
 p3 = np.array([20,0]) #3rd joint
@@ -17,36 +17,30 @@ def solve(tPos):
     global a1, a2, a3
     i = 0
     while True:
-        #TODO: angle limits
         i += 1
-        #1
-        s1 = get_vector_angle(p3, p4, tPos)
-        s1_r = get_vector_angle(p2, p4, p3)
-        s1 = clamp(s1_r - max_angle, s1, s1_r + max_angle)
-        p4 = rotate_around(p4, p3, s1)
-        r1 = get_vector_angle(p3, np.array([p3[0] + 1, p3[1]]), p4)
+        #find the correct angle for the end effector joint (3)
+        a3_current_absolute = get_vector_angle_nr(p3,p4) #current joint rotation, absolute
+        a3_current_relative = get_vector_angle(p2,p4,p3) #current joint rotation, relative
+        a3_rotation_desire = get_vector_angle(p3,p4,tPos) #relative rotation change needed for 3rd joint
+        p4 = rotate_around(p4,p3,a3_rotation_desire) #rotate end effector about joint
+        #check if we're close enough
         nc = np.abs(p4[0] - tPos[0]) + np.abs(p4[1] - tPos[1]) < 1 or i > 10
-        #2
-        s2 = get_vector_angle(p2,p4,tPos)
-        p3 = rotate_around(p3, p2, s2)
         if not nc:
-            p4 = point_in_direction(p3, r1 + s2, section_length)
-        c3 = get_vector_angle_nr(p1, p2)
-        r1 = get_vector_angle(p3, np.array([p3[0] + 1, p3[1]]), p4)
-        r2 = get_vector_angle(p2, np.array([p2[0] + 1, p2[1]]), p3)
-        r2_r = r2 - c3
-        r1_r = r1 - r2_r - c3
-        #3
-        s3 = get_vector_angle(p1, p4, tPos)
-        if not nc:
-            p2 = rotate_around(p2, p1, s3)
-            p3 = point_in_direction(p2, r2 + s3, section_length)
-            p4 = point_in_direction(p3, r1 + r2 + s3, section_length)
-        a1, a2, a3 = r1_r, r2_r, s1_r
-        if nc:
-            break
-
-    plot(tPos)
+            #find the correct angle for the second joint (2)
+            a2_current_absolute = get_vector_angle_nr(p2,p3) #current joint rotation, absolute
+            a2_current_relative = get_vector_angle(p1,p3,p2) #current joint rotation, relative
+            a2_rotation_desire = get_vector_angle(p2,p4,tPos) #relative rotation change needed for 2nd joint
+            p3 = rotate_around(p3,p2,a2_rotation_desire) #rotate about joint...
+            p4 = rotate_around(p4,p2,a2_rotation_desire) #along with everything connected
+            #find the correct angle for the base joint (1)
+            a1_current = get_vector_angle_nr(p1,p2) #current joint rotation, absolute (& relative)
+            a1_rotation_desire = get_vector_angle(p1,p4,tPos) #relative rotation change needed for 1st joint
+            p2 = rotate_around(p2,p1,a1_rotation_desire)
+            p3 = rotate_around(p3,p1,a1_rotation_desire)
+            p4 = rotate_around(p4,p1,a1_rotation_desire)
+        else:
+            plot(tPos)
+            break  
         
 def plot(dot):
     global p1, p2, p3, p4
