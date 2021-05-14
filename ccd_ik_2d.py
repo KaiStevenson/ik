@@ -24,7 +24,7 @@ def solve(tPos):
         a3_change = clamp(-max_angle3, smallest_angle(a3 + a3_rotation_desire), max_angle3) - a3 #clamp rotation to limits
         a3 = smallest_angle(a3 + a3_change) #make sure angle doesn't run away with succesive rotations
         p4 = rotate_around(p4,p3,a3_change) #rotate end effector about joint
-        nc = np.abs(p4[0] - tPos[0]) + np.abs(p4[1] - tPos[1]) < 1 or i > 10 #check if we're close enough
+        nc = np.abs(p4[0] - tPos[0]) + np.abs(p4[1] - tPos[1]) < 0.2 or i > 25 #check if we're close enough
         if not nc:
             #find the correct angle for the second joint (2)
             a2_rotation_desire = get_vector_angle(p2,p4,tPos) #relative rotation change needed for 2nd joint
@@ -40,7 +40,7 @@ def solve(tPos):
             p4 = rotate_around(p4,p1,a1_rotation_desire)
         else:
             plot(tPos)
-            return a1_rotation_desire, a2_change, a3_change
+            break
         
 def plot(dot):
     global p1, p2, p3, p4
