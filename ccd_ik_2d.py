@@ -3,8 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 #basic parameters
 section_length = 10
-max_angle2 = 90
-max_angle3 = 90
+max_angle2 = 140
+max_angle3 = 140
 mouse_down = False
 #initial joint positions
 p1 = np.array([0,0]) #base joint
@@ -12,7 +12,6 @@ p2 = np.array([10,0]) #2nd joint
 p3 = np.array([20,0]) #3rd joint
 p4 = np.array([30,0]) #end of arm
 a1, a2, a3 = 0, 0, 0
-
 def solve(tPos):
     global p1, p2, p3, p4
     global a1, a2, a3
@@ -41,7 +40,6 @@ def solve(tPos):
         else:
             plot(tPos)
             break
-        
 def plot(dot):
     global p1, p2, p3, p4
     global a1, a2, a3
@@ -57,18 +55,17 @@ def plot(dot):
     circle = plt.Circle(dot,0.5,color='r')
     ax.add_patch(circle)
     plt.show()
-
+#return a point extended by a length and an angle from an origin
 def point_in_direction(point, angle, length):
     x = (math.cos(math.radians(-angle)) * length) + point[0]
     y = (math.sin(math.radians(-angle)) * length) + point[1]
     return np.array([x,y])
-
+#returns a point rotated by angle about center
 def rotate_around(point, center, angle):
     a = math.radians(-angle)
     qx = center[0] + math.cos(a) * (point[0] - center[0]) - math.sin(a) * (point[1] - center[1])
     qy = center[1] + math.sin(a) * (point[0] - center[0]) + math.cos(a) * (point[1] - center[1])
     return np.array([qx, qy])
-
 #returns the angle between the vectors (origin > target) & (origin > end)
 def get_vector_angle(origin, end, target):
     v1 = target - origin
